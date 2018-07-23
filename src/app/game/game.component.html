@@ -1,0 +1,16 @@
+<mat-nav-list>
+  <h3 mat-subheader>Bidders</h3>
+  <mat-list-item (click)="bidder(0)">
+    {{ (players | async)[dealer | async].name }} - Dealer
+  </mat-list-item>
+  <mat-list-item>
+    {{ (players | async)[((dealer | async) + 1) % 4].name }} - Starts Bid
+  </mat-list-item>
+  <mat-list-item>
+    {{ (players | async)[((dealer | async) + 2) % 4].name }}
+  </mat-list-item>
+  <mat-list-item>
+    {{ (players | async)[((dealer | async) + 3) % 4].name }}
+  </mat-list-item>
+  <mat-divider></mat-divider>
+</mat-nav-list>
