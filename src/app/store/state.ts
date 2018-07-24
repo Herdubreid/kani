@@ -2,6 +2,12 @@ import { INavState, initialNavState } from './nav-state';
 /**
  * Application State
  */
+export enum SUITS {
+    hearts = 'hearts',
+    spades = 'spades',
+    clubs = 'clubs',
+    diamonds = 'diamonds'
+}
 export enum BIDS {
     _8 = 8,
     _9 = 9,

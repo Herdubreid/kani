@@ -18,7 +18,6 @@ export class HomeComponent implements OnInit, OnDestroy {
   };
   get isListening(): boolean { return annyang.isListening(); }
   toggle() {
-    console.log(annyang.isListening());
     annyang.isListening() ? annyang.abort() : annyang.start({ continuous: false });
   }
   ngOnInit() {
