@@ -5,7 +5,8 @@ import {
     MatButtonModule,
     MatIconModule,
     MatListModule,
-    MatDividerModule
+    MatDividerModule,
+    MatSnackBarModule
 } from '@angular/material';
 /**
  * App's Material Module
@@ -17,7 +18,8 @@ import {
         MatButtonModule,
         MatIconModule,
         MatListModule,
-        MatDividerModule
+        MatDividerModule,
+        MatSnackBarModule
     ]
 })
 export class MaterialModule { };

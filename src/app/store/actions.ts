@@ -1,6 +1,6 @@
 import { Action } from '@ngrx/store';
 
-import { IGame } from './state';
+import { IGame } from './defs';
 /**
  * App Actions
  */

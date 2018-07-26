@@ -1,20 +1,20 @@
-import { IPlayer, IBid } from './state';
+import { IPlayer, IBid, SUITS, BIDS } from './defs';
 /**
  * Navigation
  */
 export interface INavState {
     sideNav: boolean;
     bidder: IPlayer;
-    bid: IBid,
     partner: IPlayer;
     bids: IBid[];
-    games: number;
+    bid: BIDS,
+    suit: SUITS;
 }
 export const initialNavState: INavState = {
     sideNav: false,
     bidder: null,
-    bid: null,
     partner: null,
     bids: [],
-    games: 0
+    bid: BIDS.eight,
+    suit: SUITS.hearts
 };

@@ -2,7 +2,8 @@ import { Component, OnInit } from '@angular/core';
 import { Observable } from 'rxjs';
 import { Store } from '@ngrx/store';
 
-import { IState, NavActions } from './store';
+import { IState } from './store/state';
+import { NavActions } from './store/nav-actions';
 
 @Component({
   selector: 'app-root',

@@ -1,15 +1,33 @@
 import { Component, OnInit, OnDestroy, ViewChild, ElementRef } from '@angular/core';
-import { Observable, Subscription } from 'rxjs';
+import { Router } from '@angular/router';
+import { MatSnackBar } from '@angular/material';
+import { Subscription } from 'rxjs';
 import { Store } from '@ngrx/store';
 import { Annyang, CommandOption } from 'annyang';
 import * as d3 from 'd3';
 
 declare const annyang: Annyang;
-const STOP = 'stop';
+const YES = 'yes';
+const NO = 'no';
+const HEARTS = 'hearts';
+const SPADES = 'spades';
+const DIAMONDS = 'diamonds';
+const CLUBS = 'clubs';
 const NEXT = 'next';
 const LAST = 'last';
+const HIGH = 'high';
+const LOW = 'low';
+const EIGHT = '8';
+const NINE = '9';
+const TEN = '10';
+const ELEVEN = '11';
+const TWELVE = '12';
+const THIRTEEN = '13';
+const FIFTY = '50';
 
-import { IState, IPlayer, IGame, NavActions, SUITS } from '../store';
+import { SUITS, BIDS } from '../store/defs';
+import { IState } from '../store/state';
+import { NavActions } from '../store/nav-actions';
 
 @Component({
   selector: 'app-game',
@@ -18,7 +36,6 @@ import { IState, IPlayer, IGame, NavActions, SUITS } from '../store';
 })
 export class GameComponent implements OnInit, OnDestroy {
   @ViewChild('game') gameElement: ElementRef;
-  @ViewChild('spades') spades: ElementRef;
   width = 0;
   height = 0;
   radius = 0;
@@ -29,42 +46,53 @@ export class GameComponent implements OnInit, OnDestroy {
     left: 10
   };
   cmds: CommandOption = {
-    'select': () => console.log('Select'),
-    'back': () => console.log('Back'),
-    'yes': () => console.log('Yes'),
-    'no': () => console.log('No'),
-    STOP: () => this.store.dispatch(new NavActions.StopGameAction()),
-    NEXT: () => this.store.dispatch(new NavActions.NextAction()),
-    LAST: () => this.store.dispatch(new NavActions.LastAction())
+    HEARTS: () => this.store.dispatch(new NavActions.SuitAction(SUITS.hearts)),
+    SPADES: () => this.store.dispatch(new NavActions.SuitAction(SUITS.spades)),
+    DIAMONDS: () => this.store.dispatch(new NavActions.SuitAction(SUITS.diamonds)),
+    CLUBS: () => this.store.dispatch(new NavActions.SuitAction(SUITS.clubs)),
+    NEXT: () => this.store.dispatch(new NavActions.NextSuitAction()),
+    LAST: () => this.store.dispatch(new NavActions.LastSuitAction()),
+    HIGH: () => this.store.dispatch(new NavActions.NextBidAction()),
+    LOW: () => this.store.dispatch(new NavActions.LastBidAction()),
+    EIGHT: () => this.store.dispatch(new NavActions.BidAction(BIDS.eight)),
+    NINE: () => this.store.dispatch(new NavActions.BidAction(BIDS.nine)),
+    TEN: () => this.store.dispatch(new NavActions.BidAction(BIDS.ten)),
+    ELEVEN: () => this.store.dispatch(new NavActions.BidAction(BIDS.eleven)),
+    TWELVE: () => this.store.dispatch(new NavActions.BidAction(BIDS.twelve)),
+    THIRTEEN: () => this.store.dispatch(new NavActions.BidAction(BIDS.thirteen)),
+    FIFTY: () => this.store.dispatch(new NavActions.BidAction(BIDS.KANI)),
+    YES: () => this.sb.open('Ok', '', { duration: 3000 }),
+    NO: () => this.sb.open('Try again then', '', { duration: 3000 })
   };
-  dealer = 0;
-  players: Observable<IPlayer[]>;
-  games: Observable<IGame[]>;
+  suit = SUITS.hearts;
+  bid = BIDS.eight;
   subs: Subscription[] = [];
-  play(player: number) {
-    console.log(player);
-    /*this.store.dispatch(new NavActions.PlayGameAction({
-      bid: BIDS._12,
-
-    }));*/
-  }
   rotate() {
     d3.select('.circle')
       .transition(d3.transition().duration(400))
-      .attr('transform', `translate(${this.width / 2},${this.height / 2}) rotate(${(this.dealer + 1) * -90 % 360 - 45})`);
+      .attr('transform', `translate(${this.width / 2},${this.height / 2}) rotate(${this.suit * -90 - 45})`);
     const suit = d3.arc()
       .outerRadius(this.radius - 40)
       .innerRadius(this.radius - 40);
     d3.selectAll<d3.BaseType, any>('.suit')
       .transition(d3.transition().duration(300))
-      .attr('transform', d => `translate(${suit.centroid(d)}) rotate(${(this.dealer + 1) * 90 % 360 + 45})`)
+      .attr('transform', d => `translate(${suit.centroid(d)}) rotate(${this.suit * 90 % 360 + 45})`)
       .select('img')
       .attr('margin', 'auto')
       .attr('height', this.radius / 2)
       .style('top', `-${this.radius / 4}px`)
       .style('left', `-${this.radius / 4}px`);
+    d3.selectAll('.label')
+      .transition(d3.transition().duration(300))
+      .attr('transform', `rotate(${this.suit * 90 % 360 + 45})`)
+      .attr('font-size', `${this.radius / 2}px`);
+  }
+  label() {
+    d3.selectAll('.label')
+      .text(this.bid.toString());
   }
   ngOnInit() {
+    setTimeout(() => this.sb.open('Lets go...', '', { duration: 3000 }));
     this.width = this.gameElement.nativeElement.clientWidth - this.margin.left - this.margin.right;
     this.height = this.gameElement.nativeElement.clientHeight - this.margin.top - this.margin.bottom;
     this.radius = Math.min(this.width, this.height) / 2 * .7;
@@ -87,37 +115,62 @@ export class GameComponent implements OnInit, OnDestroy {
     arc.append('path')
       .attr('d', <any>path)
       .attr('fill', 'none');
-    /*arc.append('foreignObject')
-      .attr('class', 'suit')
-      .append('img')
-      .attr('height', this.radius / 2)
-      .attr('width', this.radius / 2)
-      .attr('src', d => `/assets/${d.data}.svg`)
-      .style('margin', 'auto')
-      .style('position', 'relative')
-      .style('top', `-${this.radius / 4}px`)
-      .style('left', `-${this.radius / 4}px`);*/
     arc.append('svg:foreignObject')
       .attr('class', 'suit')
-      .html(d => `<img style="position:relative;" src="/assets/${d.data}.svg">`);
+      .html(d => `<img style="position:relative;" src="assets/${SUITS[d.data]}.svg">`);
+    g.selectAll('.label')
+      .data([this.bid])
+      .enter().append('text')
+      .attr('class', 'label')
+      .attr('text-anchor', 'middle')
+      .text(d => d.toString());
     this.rotate();
-    this.subs.push(this.store.select(s => s.nav.games % 4)
-      .subscribe(d => {
-        this.dealer = d;
+    this.subs.push(this.store.select(s => s.nav.suit)
+      .subscribe(s => {
+        this.suit = s;
         this.rotate();
       }));
+    this.subs.push(this.store.select(s => s.nav.bid)
+      .subscribe(b => {
+        this.bid = b;
+        this.label();
+      }));
+    annyang.addCallback('resultNoMatch', result => {
+      console.log(result);
+      setTimeout(() => this.sb.open(`Did you say ${result[0]}?`, '', {
+        duration: 3000
+      }));
+    });
     annyang.addCommands(this.cmds);
     annyang.start({ continuous: false });
   }
   ngOnDestroy() {
-    annyang.removeCommands([STOP, NEXT, LAST]);
+    annyang.removeCommands([
+      YES,
+      NO,
+      HEARTS,
+      SPADES,
+      DIAMONDS,
+      CLUBS,
+      NEXT,
+      LAST,
+      HIGH,
+      LOW,
+      EIGHT,
+      NINE,
+      TEN,
+      ELEVEN,
+      TWELVE,
+      THIRTEEN,
+      FIFTY
+    ]);
     annyang.abort();
     this.subs.forEach(s => s.unsubscribe());
   }
   constructor(
+    private router: Router,
+    private sb: MatSnackBar,
     private store: Store<IState>
   ) {
-    this.players = store.select(s => s.app.players);
-    this.games = store.select(s => s.app.games);
   }
 }

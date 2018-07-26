@@ -1,25 +1,26 @@
 import { Action } from '@ngrx/store';
 
-import { IGame } from './state';
+import { IGame, BIDS, SUITS } from './defs';
 /**
  * Navigation Actions
  */
 export enum NavTypes {
-    START_GAME = 'NAV_START_GAME',
-    STOP_GAME = 'NAV_STOP_GAME',
+    NAVIGATE = 'NAV_NAVIGATE',
     TOGGLE_SIDENAV = 'NAV_TOGGLE_SIDENAV',
     BIDDER = 'NAV_BIDDER',
     PLAY_GAME = 'NAV_PLAY_GAME',
     GAME_FINISED = 'NAV_GAME_FINISHED',
-    NEXT = 'NAV_NEXT',
-    LAST = 'NAV_LAST'
+    SUIT = 'NAV_SUIT',
+    NEXT_SUIT = 'NAV_NEXT_SUIT',
+    LAST_SUIT = 'NAV_LAST_SUIT',
+    BID = 'NAV_BID',
+    NEXT_BID = 'NAV_NEXT_BID',
+    LAST_BID = 'NAV_LAST_BID'
 }
 export namespace NavActions {
-    export class StartGameAction implements Action {
-        readonly type = NavTypes.START_GAME;
-    }
-    export class StopGameAction implements Action {
-        readonly type = NavTypes.STOP_GAME;
+    export class NavigateAction implements Action {
+        readonly type = NavTypes.NAVIGATE;
+        constructor(public page: string) {}
     }
     export class ToggleSideNavAction implements Action {
         readonly type = NavTypes.TOGGLE_SIDENAV;
@@ -37,20 +38,39 @@ export namespace NavActions {
         readonly type = NavTypes.GAME_FINISED;
         constructor(public success: boolean) { }
     }
-    export class NextAction implements Action {
-        readonly type = NavTypes.NEXT;
+    export class SuitAction implements Action {
+        readonly type = NavTypes.SUIT;
+        constructor(public suit: SUITS) { }
+    }
+    export class NextSuitAction implements Action {
+        readonly type = NavTypes.NEXT_SUIT;
         constructor() { }
     }
-    export class LastAction implements Action {
-        readonly type = NavTypes.LAST;
+    export class LastSuitAction implements Action {
+        readonly type = NavTypes.LAST_SUIT;
+        constructor() { }
+    }
+    export class BidAction implements Action {
+        readonly type = NavTypes.BID;
+        constructor(public bid: BIDS) { }
+    }
+    export class NextBidAction implements Action {
+        readonly type = NavTypes.NEXT_BID;
+        constructor() { }
+    }
+    export class LastBidAction implements Action {
+        readonly type = NavTypes.LAST_BID;
         constructor() { }
     }
     export type AllActions =
-        StartGameAction |
-        StopGameAction |
+        NavigateAction |
         ToggleSideNavAction |
         PlayGameAction |
         GameFinishedAction |
-        NextAction |
-        LastAction;
+        SuitAction |
+        NextSuitAction |
+        LastSuitAction |
+        BidAction |
+        NextBidAction |
+        LastBidAction;
 }
