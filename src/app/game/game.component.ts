@@ -35,7 +35,7 @@ import { NavActions } from '../store/nav-actions';
   styleUrls: ['./game.component.scss']
 })
 export class GameComponent implements OnInit, OnDestroy {
-  @ViewChild('game') gameElement: ElementRef;
+  @ViewChild('game', { static: true }) gameElement: ElementRef;
   width = 0;
   height = 0;
   radius = 0;
