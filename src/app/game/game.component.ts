@@ -60,9 +60,7 @@ export class GameComponent implements OnInit, OnDestroy {
     ELEVEN: () => this.store.dispatch(new NavActions.BidAction(BIDS.eleven)),
     TWELVE: () => this.store.dispatch(new NavActions.BidAction(BIDS.twelve)),
     THIRTEEN: () => this.store.dispatch(new NavActions.BidAction(BIDS.thirteen)),
-    FIFTY: () => this.store.dispatch(new NavActions.BidAction(BIDS.KANI)),
-    YES: () => this.sb.open('Ok', '', { duration: 3000 }),
-    NO: () => this.sb.open('Try again then', '', { duration: 3000 })
+    FIFTY: () => this.store.dispatch(new NavActions.BidAction(BIDS.KANI))
   };
   suit = SUITS.hearts;
   bid = BIDS.eight;
@@ -112,17 +110,17 @@ export class GameComponent implements OnInit, OnDestroy {
       .data(pie([SUITS.hearts, SUITS.spades, SUITS.diamonds, SUITS.clubs]))
       .enter().append('g')
       .attr('class', 'arc');
-    arc.append('path')
-      .attr('d', <any>path)
-      .attr('fill', 'none');
-    arc.append('svg:foreignObject')
+    arc.append('image')
       .attr('class', 'suit')
-      .html(d => `<img style="position:relative;" src="assets/${SUITS[d.data]}.svg">`);
+      .attr('style', 'position:relative')
+      .attr('xlink:href', d => `assets/${SUITS[d.data]}.svg`)
+      .attr('height', 100)
+      .attr('width', 100);
     g.selectAll('.label')
       .data([this.bid])
       .enter().append('text')
       .attr('class', 'label')
-      .attr('text-anchor', 'middle')
+      .attr('text-anchor', 'top')
       .text(d => d.toString());
     this.rotate();
     this.subs.push(this.store.select(s => s.nav.suit)
@@ -135,14 +133,14 @@ export class GameComponent implements OnInit, OnDestroy {
         this.bid = b;
         this.label();
       }));
-    annyang.addCallback('resultNoMatch', result => {
-      console.log(result);
-      setTimeout(() => this.sb.open(`Did you say ${result[0]}?`, '', {
-        duration: 3000
-      }));
-    });
     annyang.addCommands(this.cmds);
     annyang.start({ continuous: false });
+    annyang.addCallback('resultNoMatch', results => {
+		console.log('Result: ', results);
+		this.sb.open(`I heard one of ${(results as any).join(', ')}?`, '', {
+		  duration: 3000
+		});
+	  });		
   }
   ngOnDestroy() {
     annyang.removeCommands([
